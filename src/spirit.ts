@@ -21,6 +21,9 @@ type Ranking = [{equipo: string,
 const API_URL = import.meta.env.VITE_API_URL
 
 export async function setupResultados(container: HTMLDivElement) {
+  const resultados: Ranking = await fetch(`${API_URL}/api/resultados`)
+  .then(res => res.json())
+  c_ranking(container, resultados)
   
   const faltan: Faltan = await fetch(`${API_URL}/api/respuestas_faltan`)
   .then(res => res.json())
@@ -38,10 +41,6 @@ export async function setupResultados(container: HTMLDivElement) {
   const dado: Dado = await fetch(`${API_URL}/api/dados`)
   .then(res => res.json())
   c_dado(container,dado, equipos);
-
-  const resultados: Ranking = await fetch(`${API_URL}/api/resultados`)
-  .then(res => res.json())
-  c_ranking(container, resultados)
   
 }
 
