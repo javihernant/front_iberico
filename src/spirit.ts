@@ -41,10 +41,6 @@ export async function setupResultados(container: HTMLDivElement) {
   const resultados: Ranking = await fetch(`${API_URL}/api/resultados`)
   .then(res => res.json())
   c_ranking(container, resultados)
-  
-  const faltan: Faltan = await fetch(`${API_URL}/api/respuestas_faltan`)
-  .then(res => res.json())
-  c_faltan(container,faltan);
 
   const recibidos_dados: RecibidosDados = await fetch(`${API_URL}/api/recibidos_dados`)
   .then(res => res.json())
@@ -120,20 +116,6 @@ function c_res_equipos(container: HTMLDivElement, equipos: string[]) {
         container.appendChild(table);
       })
   });
-}
-
-function c_faltan(container: HTMLDivElement, data: Faltan) {
-  const heading = document.createElement("h2");
-  heading.textContent = "Respuestas que faltan";
-  container.appendChild(heading);
-
-  const respuestas = document.createElement("div");
-  respuestas.textContent = `Tenemos ${data.recibidos} / ${data.total} respuestas`
-  container.appendChild(respuestas);
-
-  const porcentaje = document.createElement("div");
-  porcentaje.textContent = `Falta un ${data.porc_faltan} (${data.num_faltan} respuestas)`
-  container.appendChild(porcentaje);
 }
 
 function c_recibidos_dados(container: HTMLDivElement, data: RecibidosDados) {
