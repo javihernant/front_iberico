@@ -42,10 +42,6 @@ export async function setupResultados(container: HTMLDivElement) {
   .then(res => res.json())
   c_ranking(container, resultados)
 
-  const recibidos_dados: RecibidosDados = await fetch(`${API_URL}/api/recibidos_dados`)
-  .then(res => res.json())
-  c_recibidos_dados(container,recibidos_dados);
-
   const recibidos: Recibidos = await fetch(`${API_URL}/api/recibidos`)
   .then(res => res.json())
   c_recibidos(container,recibidos, equipos);
@@ -116,30 +112,6 @@ function c_res_equipos(container: HTMLDivElement, equipos: string[]) {
         container.appendChild(table);
       })
   });
-}
-
-function c_recibidos_dados(container: HTMLDivElement, data: RecibidosDados) {
-  const heading = document.createElement("h2");
-  heading.textContent = "Respuestas Recibidas/Dadas por equipos";
-  container.appendChild(heading);
-
-  const table = document.createElement("table");
-  table.style.borderCollapse = "collapse";
-  table.style.width = "100%";
-  table.style.border = "1px solid #999";
-  table.style.marginBottom = "16px";
-
-  const header_row = ["Equipo","Recibidas", "Dadas", "Jugados", "Puntualidad", "Comentarios"]
-  add_row(table, header_row)
-  
-  data.table.forEach((row)=>{
-    add_row(table, row)
-  })
-  container.appendChild(table);
-
-  const glb_info = document.createElement("div");
-  glb_info.textContent = `Puntualidad: ${data.glb.puntualidad}\nComentarios:${data.glb.comentarios}`
-  container.appendChild(glb_info)
 }
 
 function c_recibidos(container: HTMLDivElement, data: Recibidos, equipos:string[]) {
