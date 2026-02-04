@@ -1,12 +1,3 @@
-interface RecibidosDados {
-  table: string[][],
-  glb: {puntualidad:string,comentarios:string}
-}
-
-interface Faltan {
-  recibidos:string, total:string, num_faltan:string, porc_faltan:string,
-}
-
 interface Recibidos {
   table:string[][], glb:String
 }
@@ -211,12 +202,14 @@ function c_dado(container: HTMLDivElement, data: Dado, equipos:string[]) {
 }
 
 function c_ranking(container: HTMLDivElement, data: Ranking) {
+  const dataContainer = document.createElement("div");
+  dataContainer.className = "data-container"
   const heading = document.createElement("h2");
   heading.textContent = "Ranking";
-  container.appendChild(heading);
+  dataContainer.appendChild(heading);
 
   const table = document.createElement("table");
-  table.className = "results-table"
+  table.className = "ranking-table"
 
   const thead = document.createElement("thead");
   const tbody = document.createElement("tbody");
@@ -232,5 +225,6 @@ function c_ranking(container: HTMLDivElement, data: Ranking) {
     <td>${el.ranking}</td>
   `;
   })
-  container.appendChild(table);
+  dataContainer.appendChild(table);
+  container.appendChild(dataContainer)
 }
