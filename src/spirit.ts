@@ -55,19 +55,6 @@ export async function setupResultados(container: HTMLDivElement) {
   
 }
 
-function add_row(table:HTMLTableElement, elements: string[]) {
-  const tr = document.createElement("tr");
-
-  elements.forEach(el=>{
-    const td = document.createElement("td");
-    td.textContent = el;
-    td.style.border = "1px solid #999";
-    td.style.padding = "6px 10px";
-    tr.appendChild(td);
-  })
-  table.appendChild(tr);
-}
-
 function c_res_equipos(container: HTMLDivElement, equipos: string[]) {
 
   const heading = document.createElement("h2");
@@ -146,49 +133,81 @@ function c_res_equipos(container: HTMLDivElement, equipos: string[]) {
 }
 
 function c_recibidos(container: HTMLDivElement, data: Recibidos, equipos:string[]) {
+  const dataContainer = document.createElement("div");
+  dataContainer.className = "data-container"
+  
   const heading = document.createElement("h2");
   heading.textContent = "SPIRIT Recibido";
-  container.appendChild(heading);
+  dataContainer.appendChild(heading);
 
   const table = document.createElement("table");
-  table.style.borderCollapse = "collapse";
-  table.style.width = "100%";
-  table.style.border = "1px solid #999";
-  table.style.marginBottom = "16px";
+  table.className = "results-table"
 
-  const header_row = ["Equipo","REG", "FAL", "IMP", "ACT", "COM", "GLB"];
-  add_row(table, header_row)
-  data.table.forEach((row,i)=>{
-    add_row(table, [equipos[i],...row])
+  const thead = document.createElement("thead");
+  const tbody = document.createElement("tbody");
+  
+  // Static headers stay forever
+  thead.innerHTML = `<tr>${["Equipo","REG", "FAL", "IMP", "ACT", "COM", "GLB"].map(h => `<th>${h}</th>`).join('')}</tr>`;
+  table.append(thead, tbody);
+
+  dataContainer.appendChild(table)
+
+  data.table.forEach((pts,i)=>{
+    const row = tbody.insertRow()
+    row.innerHTML = `
+    <td>${equipos[i]}</td>
+    <td>${pts[0]}</td>
+    <td>${pts[1]}</td>
+    <td>${pts[2]}</td>
+    <td>${pts[3]}</td>
+    <td>${pts[4]}</td>
+    <td>${pts[5]}</td>
+  `;
   })
-  container.appendChild(table);
-
   const glb_info = document.createElement("div");
   glb_info.textContent = `GLB medio: ${data.glb}`
-  container.appendChild(glb_info)
+  dataContainer.appendChild(glb_info)
+
+  container.appendChild(dataContainer);
 }
 
 function c_dado(container: HTMLDivElement, data: Dado, equipos:string[]) {
+  const dataContainer = document.createElement("div");
+  dataContainer.className = "data-container"
+  
   const heading = document.createElement("h2");
   heading.textContent = "SPIRIT Dado";
-  container.appendChild(heading);
+  dataContainer.appendChild(heading);
 
   const table = document.createElement("table");
-  table.style.borderCollapse = "collapse";
-  table.style.width = "100%";
-  table.style.border = "1px solid #999";
-  table.style.marginBottom = "16px";
+  table.className = "results-table"
 
-  const header_row = ["Equipo","REG", "FAL", "IMP", "ACT", "COM", "GLB"];
-  add_row(table, header_row)
-  data.table.forEach((row,i)=>{
-    add_row(table, [equipos[i],...row])
+  const thead = document.createElement("thead");
+  const tbody = document.createElement("tbody");
+  
+  // Static headers stay forever
+  thead.innerHTML = `<tr>${["Equipo","REG", "FAL", "IMP", "ACT", "COM", "GLB"].map(h => `<th>${h}</th>`).join('')}</tr>`;
+  table.append(thead, tbody);
+
+  dataContainer.appendChild(table)
+
+  data.table.forEach((pts,i)=>{
+    const row = tbody.insertRow()
+    row.innerHTML = `
+    <td>${equipos[i]}</td>
+    <td>${pts[0]}</td>
+    <td>${pts[1]}</td>
+    <td>${pts[2]}</td>
+    <td>${pts[3]}</td>
+    <td>${pts[4]}</td>
+    <td>${pts[5]}</td>
+  `;
   })
-  container.appendChild(table);
-
   const glb_info = document.createElement("div");
   glb_info.textContent = `GLB medio: ${data.glb}`
-  container.appendChild(glb_info)
+  dataContainer.appendChild(glb_info)
+
+  container.appendChild(dataContainer);
 }
 
 function c_ranking(container: HTMLDivElement, data: Ranking) {
@@ -197,12 +216,21 @@ function c_ranking(container: HTMLDivElement, data: Ranking) {
   container.appendChild(heading);
 
   const table = document.createElement("table");
-  table.style.borderCollapse = "collapse";
-  table.style.width = "100%";
-  table.style.border = "1px solid #999";
+  table.className = "results-table"
+
+  const thead = document.createElement("thead");
+  const tbody = document.createElement("tbody");
+
+  thead.innerHTML = `<tr>${["Equipo","Puntuación", "Posicion"].map(h => `<th>${h}</th>`).join('')}</tr>`;
+  table.append(thead, tbody);
   
   data.forEach((el)=>{
-    add_row(table, [el.equipo,String(el.puntuacion), el.ranking])
+    const row = tbody.insertRow()
+    row.innerHTML = `
+    <td>${el.equipo}</td>
+    <td>${el.puntuacion}</td>
+    <td>${el.ranking}</td>
+  `;
   })
   container.appendChild(table);
 }
