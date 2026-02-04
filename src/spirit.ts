@@ -26,7 +26,7 @@ type Ranking = [{equipo: string,
     im: number;
     ac: number;
     com: number;
-    tot: number;
+    comment: string;
   }
   
   interface RespuestasEquipos {
@@ -38,6 +38,9 @@ const API_URL = import.meta.env.VITE_API_URL
 
 export async function setupResultados(container: HTMLDivElement) {
   const equipos: string[] = await fetch(`${API_URL}/api/equipos`).then(res => res.json())
+
+  c_res_equipos(container, equipos)
+
   const resultados: Ranking = await fetch(`${API_URL}/api/resultados`)
   .then(res => res.json())
   c_ranking(container, resultados)
@@ -48,9 +51,7 @@ export async function setupResultados(container: HTMLDivElement) {
 
   const dado: Dado = await fetch(`${API_URL}/api/dados`)
   .then(res => res.json())
-  c_dado(container,dado, equipos);
-
-  c_res_equipos(container, equipos)
+  c_dado(container,dado, equipos);  
   
 }
 
@@ -70,46 +71,76 @@ function add_row(table:HTMLTableElement, elements: string[]) {
 function c_res_equipos(container: HTMLDivElement, equipos: string[]) {
 
   const heading = document.createElement("h2");
-  heading.textContent = "Respuestas recibidas de cada equipo";
-  container.appendChild(heading);
-  heading.style.marginBottom = "16px";
-
+  heading.textContent = "Puntuacion de equipos";
 
   const select = document.createElement("select");
   select.innerHTML = '<option value="">Selecciona equipo</option>';
   equipos.forEach(e => {
-    const option = document.createElement("option");
-    option.value = e;
-    option.textContent = e;
-    select.appendChild(option);
+    const option = new Option(e,e)
+    select.add(option)
   })
-  select.style.marginBottom = "16px";
 
+  const hint = document.createElement("p");
+  hint.className = "helper-text hidden";
+  hint.innerHTML = `<span>ℹ️</span> Selecciona una fila de la tabla para ver los comentarios del equipo.`;
+
+  const sotgContainer = document.createElement("div");
+  sotgContainer.className = "sotg-container";
+
+  const sotgDisplay = document.createElement("div");
+  sotgDisplay.className = "puntuacion-sotg hidden"
 
   const table = document.createElement("table");
-  table.style.borderCollapse = "collapse";
-  table.style.width = "100%";
-  table.style.border = "1px solid #999";
-  table.style.marginBottom = "16px";
-  const header_row = ["Equipo","REG", "FAL", "IMP", "ACT", "COM", "SUM"];
-  add_row(table, header_row)
+  table.className = "results-table hidden"
 
-  container.appendChild(select)
+  const thead = document.createElement("thead");
+  const tbody = document.createElement("tbody");
+  
+  // Static headers stay forever
+  thead.innerHTML = `<tr>${["Equipo","REG", "FAL", "IMP", "ACT", "COM"].map(h => `<th>${h}</th>`).join('')}</tr>`;
+  table.append(thead, tbody);
+  sotgContainer.append(heading, select, sotgDisplay, hint, table)
+  container.append(sotgContainer)
+
   select.addEventListener("change", () => {
-    if (!select.value) return;
+    if (!select.value) {
+      sotgDisplay.classList.add("hidden")
+      table.classList.add("hidden")
+      hint.classList.add("hidden")
+      return;
+    }
   
     fetch(`${API_URL}/api/respuestas/${encodeURIComponent(select.value)}`)
       .then(res => res.json() as Promise<RespuestasEquipos>)
       .then(data => {
-        data.equipos.forEach(equipo => {
-          add_row(table, [equipo.orig, equipo.con.toString(), equipo.fa.toString(), equipo.im.toString(), equipo.ac.toString(), equipo.com.toString(), equipo.tot.toString()])
+        tbody.innerHTML = "";
+        sotgDisplay.textContent = `SOTG: ${data.sotg}`;
+        data.equipos.forEach((equipo)=> {
+          const row = tbody.insertRow()
+          row.innerHTML = `
+          <td>▾ ${equipo.orig}</td>
+          <td>${equipo.con}</td>
+          <td>${equipo.fa}</td>
+          <td>${equipo.im}</td>
+          <td>${equipo.ac}</td>
+          <td>${equipo.com}</td>
+        `;
+          const commentRow = tbody.insertRow()
+          commentRow.className = "comment-row hidden";
+          commentRow.innerHTML = `
+            <td colspan="6">
+              <div class="comment-content">
+                <strong>Comentario:</strong> ${equipo.comment || "Sin comentarios."}
+              </div>
+            </td>
+          `;
+          row.addEventListener("click", () => {
+            commentRow.classList.toggle("hidden");
+          });
         })
-        const puntuacion = document.createElement("div");
-        puntuacion.textContent = `SOTFG: ${data.sotg}`
-        puntuacion.style.fontWeight = "bold";
-        puntuacion.style.marginBottom = "16px";
-        container.appendChild(puntuacion)
-        container.appendChild(table);
+        sotgDisplay.classList.remove("hidden");
+        hint.classList.remove("hidden");
+        table.classList.remove("hidden");
       })
   });
 }
